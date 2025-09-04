@@ -21,7 +21,11 @@ def print_grid(env, state):
             elif np.array_equal([i, j], env.goal):
                 row.append('G')  # 目标
             elif env.obstacles[i, j]:
-                row.append('X')  # 障碍物
+                row.append('#')  # 障碍物
+            elif env.stars[i, j] and not env.starsEaten[i, j]:
+                row.append('$')  # 奖励
+            elif env.traps[i, j] and not env.trapsFallen[i, j]:
+                row.append('*')  # 惩罚
             else:
                 row.append('.')  # 空位置
         print(' '.join(row))
@@ -35,10 +39,11 @@ def main():
     total_reward = 0
     step_count = 0
     crashed_time = 0
+    star_count = 0
+    trap_count = 0
 
     print(f"===Round start===\n")
 
-    reach_to_goal = True
     print_grid(env, state)
 
     while not done:
@@ -49,6 +54,10 @@ def main():
         step_count += 1
         if info[0]:
             crashed_time += 1
+        if info[1]:
+            star_count += 1
+        if info[2]:
+            trap_count += 1
 
         state = next_state
 
@@ -57,14 +66,15 @@ def main():
             print(f"step {step_count}")
             print_grid(env, state)
 
-        if step_count == 500:
-            reach_to_goal = False
+        if step_count == 150:
             break
     
-    print(f"reach to goal: {reach_to_goal}")
+    print(f"reach to goal: {done}")
     print(f"step: {step_count}")
-    print(f"total_reward: {total_reward}")
-    print(f"crashed_time: {crashed_time}")
+    print(f"total reward: {total_reward}")
+    print(f"crashed time: {crashed_time}")
+    print(f"star: {star_count}")
+    print(f"trap: {trap_count}")
 
     print("\n===Round end!===")
 
